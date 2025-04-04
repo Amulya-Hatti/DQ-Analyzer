@@ -1,34 +1,35 @@
-import { useAuth } from './context/AuthContext';
-import Login from './components/Auth/Login';
-import Upload from './components/Dashboard/Upload';
-import Results from './components/Dashboard/Results';
-import { useState } from 'react';
-import './App.css';
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
 
-export default function App() {
-  const { user, loading, logout } = useAuth();
-  const [results, setResults] = useState(null);
-
-  if (loading) {
-    return <div className="app-loading">Loading...</div>;
-  }
-
-  if (!user) return <Login />;
+function App() {
+  const [count, setCount] = useState(0)
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1 className="welcome-text">Welcome, {user.email}</h1>
-        <button onClick={logout} className="logout-btn">
-          <i className="fas fa-sign-out-alt"></i> Logout
+    <>
+      <div>
+        <a href="https://vite.dev" target="_blank">
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
         </button>
-      </header>
-      
-      {!results ? (
-        <Upload onUploadSuccess={setResults} />
-      ) : (
-        <Results data={results} onReset={() => setResults(null)} />
-      )}
-    </div>
-  );
+        <p>
+          Edit <code>src/App.jsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </>
+  )
 }
+
+export default App

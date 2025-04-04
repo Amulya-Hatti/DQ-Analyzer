@@ -1,52 +1,80 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../services/firebase';
-import { signOut } from 'firebase/auth';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { 
+  signInWithPopup, 
+  signOut, 
+  onAuthStateChanged, 
+  getIdToken 
+} from 'firebase/auth';
+import { auth, googleProvider } from '../services/firebase';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+export const useAuth = () => useContext(AuthContext);
+
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [firebaseToken, setFirebaseToken] = useState(null);
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setUser(user || null);
-      if (user) {
-        try {
-          const token = await user.getIdToken();
-          setToken(token);
-        } catch (error) {
-          console.error("Token error:", error);
-        }
-      }
-      setLoading(false);
-    });
-    
-    return () => unsubscribe();
-  }, []);
-
-  const logout = async () => {
+  const signInWithGoogle = async () => {
     try {
-      await signOut(auth);
-      setUser(null);
-      setToken(null);
+      const result = await signInWithPopup(auth, googleProvider);
+      return result;
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Error signing in with Google:", error);
+      throw error;
     }
   };
 
+  const userSignOut = () => {
+    return signOut(auth);
+  };
+
+  // Set up authentication headers for API requests
+  useEffect(() => {
+    const getAndSetToken = async (user) => {
+      if (user) {
+        try {
+          const token = await getIdToken(user);
+          setFirebaseToken(token);
+          
+          // Set default auth header for axios
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
+          // Send token to backend for verification
+          await axios.post(`${import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '')}/auth/firebase-login`, {
+            idToken: token
+          });
+        } catch (error) {
+          console.error("Error getting or verifying token:", error);
+        }
+      } else {
+        setFirebaseToken(null);
+        delete axios.defaults.headers.common['Authorization'];
+      }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      getAndSetToken(user);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const value = {
+    currentUser,
+    firebaseToken,
+    signInWithGoogle,
+    userSignOut,
+    loading
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, logout }}>
+    <AuthContext.Provider value={value}>
       {!loading && children}
     </AuthContext.Provider>
   );
-}
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };

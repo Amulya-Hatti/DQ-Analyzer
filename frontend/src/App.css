@@ -1,40 +1,42 @@
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid #eee;
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
-.logout-btn {
-  background: none;
-  color: #666;
-  padding: 0.6rem 1.2rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-.logout-btn:hover {
-  background: #f8f9fa;
-  border-color: #999;
-  color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
 
+.card {
+  padding: 2em;
+}
 
-/* For a more professional icon (using CSS) */
-/* .logout-btn::before {
-  content: "";
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M5 22C4.45 22 3.979 21.804 3.587 21.412C3.195 21.02 3 20.55 3 20V4C3 3.45 3.195 2.979 3.587 2.587C3.979 2.195 4.45 2 5 2H12V4H5V20H12V22H5ZM16 16L14.625 14.55L17.175 12H9V10H17.175L14.625 7.45L16 6L21 11L16 16Z"/></svg>');
-  background-size: contain;
-} */
+.read-the-docs {
+  color: #888;
+}
